@@ -137,27 +137,33 @@ a { color: inherit; text-decoration: none; }
     display: inline-block;
     background: var(--accent-light);
     color: var(--accent);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 0.35rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
     border-radius: 999px;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.badge-dot {
+    font-size: 0.6rem;
+    margin-right: 0.4rem;
 }
 
 .hero-title {
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    line-height: 1.1;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    line-height: 1.15;
     letter-spacing: -0.02em;
     color: var(--ink);
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
 }
 
 .hero-title em {
-    font-style: italic;
+    font-style: normal;
+    font-weight: 700;
     color: var(--accent);
+    display: block;
 }
 
 .hero-subtitle {
@@ -172,6 +178,14 @@ a { color: inherit; text-decoration: none; }
     display: flex;
     gap: 1rem;
     align-items: center;
+    margin-top: 2rem;
+}
+
+.hero-actions .btn-primary {
+    padding: 0.7rem 1.8rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.95rem;
 }
 
 /* ------------------------------------------------------------------ */
@@ -187,42 +201,77 @@ a { color: inherit; text-decoration: none; }
     background: var(--paper-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 2rem;
+    padding: 1.5rem;
     width: 100%;
-    max-width: 380px;
+    max-width: 450px;
     box-shadow: 0 8px 40px rgba(0,0,0,0.06);
 }
 
-.mock-card-header {
+.mock-card-dots {
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 1.75rem;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--border-soft);
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
 }
 
-.mock-label {
-    font-size: 0.8rem;
-    font-weight: 500;
+.mock-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.mock-dot-red { background: #e74c3c; }
+.mock-dot-orange { background: #e8a337; }
+.mock-dot-teal { background: #1abc9c; }
+
+.mock-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.mock-stat-card {
+    background: #f9f9f9;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    text-align: center;
+}
+
+.mock-stat-label {
+    display: block;
+    font-size: 0.7rem;
     color: var(--ink-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    margin-bottom: 0.4rem;
+    text-transform: capitalize;
 }
 
-.mock-total {
+.mock-stat-value {
+    display: block;
     font-family: var(--font-display);
-    font-size: 1.75rem;
+    font-size: 1.4rem;
+    font-weight: 700;
     color: var(--ink);
+    margin-bottom: 0.3rem;
 }
+
+.mock-stat-change {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+}
+
+.mock-stat-up { color: #e74c3c; }
+.mock-stat-good { color: var(--accent); }
 
 .mock-bars { display: flex; flex-direction: column; gap: 1rem; }
 
 .mock-bar-row {
     display: grid;
-    grid-template-columns: 80px 1fr 60px;
+    grid-template-columns: 60px 1fr;
     align-items: center;
     gap: 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
 .mock-cat {
@@ -232,8 +281,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 .mock-bar-track {
-    height: 6px;
-    background: var(--border-soft);
+    height: 8px;
+    background: #e8e8e8;
     border-radius: 999px;
     overflow: hidden;
 }
@@ -245,16 +294,12 @@ a { color: inherit; text-decoration: none; }
     transition: width 0.6s ease;
 }
 
-.mock-bar-2 { background: var(--accent-2); }
+.mock-bar-2 { background: #e8a337; }
 .mock-bar-3 { background: #5b7fa6; }
 .mock-bar-4 { background: #8b5e83; }
+.mock-bar-5 { background: #3498db; }
+.mock-bar-6 { background: #9b59b6; }
 
-.mock-amt {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--ink-muted);
-    text-align: right;
-}
 
 /* ------------------------------------------------------------------ */
 /* Buttons                                                             */
