@@ -1,24 +1,12 @@
 ---
 name: git-auto-commit
-description:  Analyse ,adds and commits as per code diff
+description: Analyze diffs, group related changes by type/scope, create conventional commits. Stages files selectively per group (not all at once) for atomic, logical commits. Use `/git-commit`.
 allowed-tools: Read, Bash(git:*), Write
 ---
 
-# Git Auto-Commit Slash Command
+# Git Auto-Commit
 
-Automatically analyze your code changes, intelligently organize them into logical commit groups, and create conventional commits with proper typing and scoping.
-
-## Overview
-
-When you run `/git-commit`, the command:
-1. Analyzes all your modified files
-2. Examines the actual code changes (diffs)
-3. Detects what type of changes were made (feature, fix, chore, etc.)
-4. Groups related files together logically
-5. Plans a sequence of conventional commits
-6. Stages and commits each group separately
-7. Creates properly formatted commit messages
-8. Shows you a complete summary
+Automatically analyze code changes, group them logically, and create conventional commits with proper typing and scoping.
 
 ## Usage
 
@@ -26,22 +14,87 @@ When you run `/git-commit`, the command:
 /git-commit
 ```
 
-**No arguments needed!** The command analyzes your actual code changes and commits intelligently based on what it detects.
+No arguments. Analyzes diffs and commits intelligently.
 
----
+## Workflow
 
-## Complete Workflow
+1. **Verify repository** — check `.git` exists
+2. **Analyze files** — `git status --porcelain`
+3. **Examine diffs** — `git diff <file>` to detect type and scope
+4. **Group changes** — by type (feat, fix, test, chore) and scope (auth, db, api, etc.)
+5. **Stage selectively** — only files for ONE group per commit (not all at once)
+6. **Create commit** — conventional format: `type(scope): description`
+7. **Repeat** — until all groups committed
+8. **Summary** — show all commits created
 
-### Step 1: Verify Git Repository
+## Conventional Format
 
-Check if we're in a valid git repository.
-
-```bash
-git rev-parse --git-dir
+```
+feat(auth): add login endpoint
+fix(database): resolve pooling issue
+test(auth): add test cases
+chore: update dependencies
+refactor(api): simplify handler
+docs(readme): add setup guide
+perf(db): optimize queries
 ```
 
-**What it does:**
-- Checks for `.git` directory in current or parent directories
-- Validates git is properly initialized
+## Auto-Detected Scopes
 
-**Success:**
+Based on file paths: `app` → api, `models` → models, `auth` → auth, `db/database` → database, `tests/test_` → test, `config` → config, `ui/frontend` → ui, `utils` → utils, `middleware` → middleware
+
+## Why Selective Staging?
+
+**Bad:** `git add .` → mixes unrelated changes, unclear commits, hard to revert  
+**Good:** `/git-commit` → atomic commits, clear intent, easy to cherry-pick or revert
+
+## Example
+
+**Before:**
+```
+ M app.py
+ M models/user.py
+ M requirements.txt
+?? tests/test_auth.py
+```
+
+**Groups detected:**
+- Group 1: auth feature (app.py, models/user.py, tests/test_auth.py)
+- Group 2: chore (requirements.txt)
+
+**Result:**
+```
+git add app.py models/user.py tests/test_auth.py
+git commit -m "feat(auth): add login and verification"
+
+git add requirements.txt
+git commit -m "chore: update packages"
+```
+
+## Benefits
+
+✅ Atomic commits  
+✅ Clear history  
+✅ Easy reviews  
+✅ Better debugging  
+✅ Semantic versioning possible  
+✅ Easy to revert specific changes  
+
+## Rules
+
+- Lowercase descriptions, imperative mood ("add", not "adds")
+- No period at end
+- Only stage related files per group
+- Skip ignored files (logs, temp, venv, etc.)
+
+## Config
+
+Set git user first:
+```bash
+git config user.name "Your Name"
+git config user.email "your@email.com"
+```
+
+## Design
+
+One thing per commit. Atomic. Clear intent. No kitchen-sink commits. Conventional format for automation.
