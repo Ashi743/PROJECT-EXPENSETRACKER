@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — Spendly{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="profile-wrapper">
+
+        <!-- Header with user info and stats -->
+        <div class="profile-header">
+            <div class="profile-user-card">
+                <div class="profile-avatar">{{ user.name[0].upper() }}</div>
+                <div>
+                    <h1 class="profile-name">{{ user.name }}</h1>
+                    <p class="profile-email">{{ user.email }}</p>
+                    <p class="profile-joined">Member since {{ joined }}</p>
+                </div>
+            </div>
+
+            <div class="profile-header-stats">
+                <div class="profile-stat-mini">
+                    <span class="profile-stat-mini-label">Total Spent</span>
+                    <span class="profile-stat-mini-value">${{ "%.2f" | format(totals.total) }}</span>
+                </div>
+                <div class="profile-stat-mini">
+                    <span class="profile-stat-mini-label">Expenses</span>
+                    <span class="profile-stat-mini-value">{{ totals.count }}</span>
+                </div>
+                <div class="profile-stat-mini">
+                    <span class="profile-stat-mini-label">Categories</span>
+                    <span class="profile-stat-mini-value">{{ by_category | length }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two-column layout: recent transactions (left) + category breakdown (right) -->
+        <div class="profile-content">
+
+            <!-- Recent transactions -->
+            <div class="profile-column">
+                <h2 class="profile-section-title">Recent Transactions</h2>
+                {% if recent %}
+                <div class="profile-transactions">
+                    {% for txn in recent %}
+                    <div class="profile-transaction-row">
+                        <div class="profile-transaction-info">
+                            <span class="profile-transaction-category">{{ txn.category }}</span>
+                            <span class="profile-transaction-description">{{ txn.description if txn.description else "No description" }}</span>
+                        </div>
+                        <div class="profile-transaction-meta">
+                            <span class="profile-transaction-date">{{ txn.date }}</span>
+                            <span class="profile-transaction-amount">${{ "%.2f" | format(txn.amount) }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="profile-empty-state">
+                    <p class="profile-empty-text">No transactions yet</p>
+                    <p class="profile-empty-sub">Add your first expense to get started</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Category breakdown -->
+            <div class="profile-column">
+                <h2 class="profile-section-title">By Category</h2>
+                {% if by_category %}
+                <div class="profile-categories">
+                    {% for row in by_category %}
+                    <div class="profile-category-item">
+                        <div class="profile-category-header">
+                            <span class="profile-category-name">{{ row.category }}</span>
+                            <span class="profile-category-amount">${{ "%.2f" | format(row.total) }}</span>
+                        </div>
+                        <p class="profile-category-meta">{{ row.count }} expense{{ 's' if row.count != 1 else '' }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="profile-empty-state">
+                    <p class="profile-empty-text">No categories yet</p>
+                    <p class="profile-empty-sub">Create an expense to populate categories</p>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+</section>
+{% endblock %}

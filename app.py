@@ -111,12 +111,61 @@ def login():
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("landing"))
+    return redirect(url_for("landing", logged_out=True))
 
 
 @app.route("/profile")
 def profile():
-    return "Profile page — coming in Step 4"
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("login"))
+
+    conn = get_db()
+    try:
+        user = conn.execute(
+            "SELECT id, name, email, created_at FROM users WHERE id = ?",
+            (user_id,)
+        ).fetchone()
+
+        if not user:
+            session.clear()
+            return redirect(url_for("login"))
+
+        totals = conn.execute(
+            "SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as total FROM expenses WHERE user_id = ?",
+            (user_id,)
+        ).fetchone()
+
+        recent = conn.execute(
+            """SELECT id, category, amount, date, description
+               FROM expenses WHERE user_id = ?
+               ORDER BY date DESC LIMIT 6""",
+            (user_id,)
+        ).fetchall()
+
+        by_category = conn.execute(
+            """SELECT category, COUNT(*) as count, SUM(amount) as total
+               FROM expenses WHERE user_id = ?
+               GROUP BY category ORDER BY total DESC""",
+            (user_id,)
+        ).fetchall()
+    finally:
+        conn.close()
+
+    from datetime import datetime
+    try:
+        joined = datetime.strptime(user["created_at"], "%Y-%m-%d %H:%M:%S").strftime("%B %d, %Y")
+    except (ValueError, TypeError):
+        joined = user["created_at"]
+
+    return render_template(
+        "profile.html",
+        user=user,
+        totals=totals,
+        recent=recent,
+        by_category=by_category,
+        joined=joined,
+    )
 
 
 @app.route("/expenses/add")

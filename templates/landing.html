@@ -4,6 +4,13 @@
 
 {% block content %}
 
+{% if request.args.get('logged_out') %}
+<div class="logout-banner">
+    <span class="logout-icon">✓</span>
+    <span class="logout-message">You logged out successfully</span>
+</div>
+{% endif %}
+
 <section class="hero">
     <div class="hero-inner">
         <div class="hero-badge"><span class="badge-dot">●</span> Free to use · No credit card needed</div>
