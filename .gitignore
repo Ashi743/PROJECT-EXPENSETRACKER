@@ -8,3 +8,6 @@ __pycache__/
 .claude/plans/
 
 .graphify
+go.mod
+main.go
+observe-agent

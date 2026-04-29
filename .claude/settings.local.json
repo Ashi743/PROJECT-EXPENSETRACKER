@@ -1,8 +1,9 @@
 {
-  "prefersReducedMotion": false,
   "permissions": {
     "allow": [
-      "Bash(python -c \"from app import app; print\\('✓ App loads OK'\\)\")"
+      "Bash(python -c \"from app import app; print\\('✓ App loads OK'\\)\")",
+      "Bash(python seed_expense_script.py 6 3 4)"
     ]
-  }
+  },
+  "prefersReducedMotion": false
 }

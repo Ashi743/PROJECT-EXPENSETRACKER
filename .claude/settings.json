@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(app.py)",
+      "Write(app.py)",
+      "Bash(git *)"
+    ]
+  }
+}
