@@ -31,6 +31,37 @@ Quick facts to keep in mind while reviewing:
 - **Port**: 5001
 - **Python 3.10+**
 
+### Known security issue in the current codebase
+The `login()` route in `app.py` does **not** call 
+`session.clear()` before setting `session["user_id"]` 
+and `session["username"]`. This is a session fixation 
+risk. If this route appears in a diff, flag it. If 
+it's pre-existing and not in the diff, note it once 
+as context so the student is aware.
+
+The safe pattern looks like this:
+
+```python
+session.clear()
+session["user_id"] = user["id"]
+session["username"] = user["name"]
+return redirect(url_for("profile"))
+```
+
+### Currently implemented routes (as of Step 6)
+| Route | Status |
+|---|---|
+| `GET /` | Implemented |
+| `GET /terms` | Implemented |
+| `GET /privacy` | Implemented |
+| `GET /register` | Implemented |
+| `GET /login` | Implemented |
+| `GET /logout` | Implemented |
+| `GET /profile` | Implemented |
+| `GET /expenses/add` | **Stub** |
+| `GET /expenses/<id>/edit` | **Stub** |
+| `GET /expenses/<id>/delete` | **Stub** |
+
 ---
 
 ## What You Review
@@ -72,12 +103,15 @@ a form field and read or destroy the database.
   `werkzeug.security.generate_password_hash` — never 
   stored in plaintext
 - On login, `session.clear()` should be called before 
-  setting new session data
-- Logout should fully clear the session
+  setting new session data (session fixation prevention)
+- Logout should fully clear the session with 
+  `session.clear()`
 
 **Why it matters**: if your DB ever leaks, hashed 
 passwords are still safe; plaintext ones are a 
-disaster.
+disaster. And without `session.clear()` on login, 
+an attacker who planted a known session ID could 
+hijack the newly authenticated session.
 
 ### 3. Authorization (Who Can See What)
 - Protected routes should check 

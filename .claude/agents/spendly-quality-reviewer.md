@@ -28,6 +28,20 @@ Quick facts to keep in mind while reviewing:
 - **Port**: 5001
 - **Python 3.10+**
 
+### Currently implemented routes (as of Step 6)
+| Route | Methods | Status |
+|---|---|---|
+| `GET /` | GET | Implemented — `landing()` |
+| `GET /terms` | GET | Implemented — `terms()` |
+| `GET /privacy` | GET | Implemented — `privacy()` |
+| `GET /register` | GET, POST | Implemented — `register()` |
+| `GET /login` | GET, POST | Implemented — `login()` |
+| `GET /logout` | GET | Implemented — `logout()` |
+| `GET /profile` | GET | Implemented — `profile()` |
+| `GET /expenses/add` | GET | **Stub** — returns placeholder string |
+| `GET /expenses/<id>/edit` | GET | **Stub** — returns placeholder string |
+| `GET /expenses/<id>/delete` | GET | **Stub** — returns placeholder string |
+
 ---
 
 ## What You Review
@@ -60,6 +74,12 @@ learning to respect:
 always know where to look. New developers can navigate 
 the project without a tour.
 
+One existing pattern worth noting: `profile()` in 
+`app.py` imports `datetime` inline at the bottom of 
+the function rather than at the top of the file. This 
+is a PEP 8 nit — imports belong at the top of the 
+module. Flag it gently if it appears in a diff.
+
 ### 2. Names Tell the Story
 - Functions and variables in `snake_case`
 - Names describe *what something is* or *what it does*, 
@@ -78,6 +98,12 @@ top-to-bottom and understand it without comments.
   error strings
 - Route functions stay focused — fetch data, render 
   template, that's it. Heavy logic moves elsewhere.
+- `logout()` currently redirects with a query param 
+  (`logged_out=True`) passed directly to `url_for()` — 
+  this is valid Flask, but worth understanding: the 
+  landing template needs to check for this param to 
+  show a confirmation message. Flag if the template 
+  doesn't handle it.
 
 **Why it matters**: these patterns are how Flask was 
 designed to be used. Following them makes your code 
