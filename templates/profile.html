@@ -45,7 +45,7 @@
                     <p class="date-filter-error">{{ date_error }}</p>
                     {% endif %}
                     {% if has_filter and filter_message %}
-                    <p class="date-filter-active">{{ filter_message }} —
+                    <p class="date-filter-active">Showing expenses {{ filter_message }} —
                         <a href="{{ url_for('profile') }}" class="date-filter-clear">Clear</a>
                     </p>
                     {% endif %}
