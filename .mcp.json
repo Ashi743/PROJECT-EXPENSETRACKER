@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "executeautomation-db": {
+      "command": "npx",
+      "args": ["-y", "@executeautomation/database-server", "spendly.db"],
+      "env": {}
+    }
+  }
+}
