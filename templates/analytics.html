@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Spendly{% endblock %}
+
+{% block head %}
+<style>
+    :root {
+        --primary: #6366f1;
+        --accent: #ec4899;
+        --success: #10b981;
+        --dark: #0f172a;
+        --dark-light: #1e293b;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-600: #475569;
+        --white: #ffffff;
+    }
+
+    .analytics-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--dark) 0%, #1a1f3a 50%, var(--dark-light) 100%);
+        padding: 4rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .analytics-content {
+        max-width: 900px;
+        width: 100%;
+        text-align: center;
+        margin-top: -2rem;
+    }
+
+    .coming-soon-badge {
+        display: inline-block;
+        background-color: rgba(16, 185, 129, 0.1);
+        border: 1px solid var(--success);
+        color: var(--success);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .analytics-headline {
+        color: var(--white);
+        font-size: clamp(2rem, 8vw, 4rem);
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+    }
+
+    .analytics-subtitle {
+        color: var(--gray-400);
+        font-size: clamp(1rem, 3vw, 1.25rem);
+        margin-bottom: 3rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .feature-card {
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 12px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+        border-color: rgba(99, 102, 241, 0.5);
+        background: rgba(30, 41, 59, 0.7);
+        transform: translateY(-4px);
+    }
+
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 1.5rem;
+    }
+
+    .feature-title {
+        color: var(--white);
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+
+    .feature-description {
+        color: var(--gray-400);
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .email-section {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 12px;
+        padding: 2.5rem;
+        margin-bottom: 3rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .email-label {
+        color: var(--gray-300);
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .email-form {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .email-input {
+        flex: 1;
+        min-width: 250px;
+        padding: 0.875rem 1.25rem;
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 8px;
+        color: var(--white);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .email-input::placeholder {
+        color: var(--gray-600);
+    }
+
+    .email-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: rgba(15, 23, 42, 0.9);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .email-input.error {
+        border-color: #ef4444;
+        background: rgba(239, 68, 68, 0.05);
+    }
+
+    .email-button {
+        padding: 0.875rem 2rem;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: var(--white);
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .email-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+
+    .email-button:active {
+        transform: translateY(0);
+    }
+
+    .email-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .error-message {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: none;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    .success-message {
+        color: var(--success);
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: none;
+    }
+
+    .success-message.show {
+        display: block;
+    }
+
+    .social-proof {
+        color: var(--gray-400);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .social-proof strong {
+        color: var(--success);
+    }
+
+    .features-footer {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        .analytics-container {
+            padding: 2rem 1rem;
+        }
+
+        .analytics-headline {
+            font-size: 2rem;
+        }
+
+        .analytics-subtitle {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .email-section {
+            padding: 1.5rem;
+        }
+
+        .email-form {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .email-input {
+            min-width: 100%;
+        }
+
+        .email-button {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="analytics-container">
+    <div class="analytics-content">
+        <span class="coming-soon-badge">Coming Soon</span>
+
+        <h1 class="analytics-headline">Advanced Analytics</h1>
+
+        <p class="analytics-subtitle">
+            Unlock powerful insights into your spending patterns with AI-driven analytics and real-time dashboards.
+        </p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Real-time Dashboards</h3>
+                <p class="feature-description">
+                    Visualize your spending trends with interactive charts and customizable reports.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">✨</div>
+                <h3 class="feature-title">AI Insights</h3>
+                <p class="feature-description">
+                    Get intelligent recommendations and predictive analytics powered by machine learning.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔐</div>
+                <h3 class="feature-title">Enterprise Security</h3>
+                <p class="feature-description">
+                    Bank-grade encryption and compliance with all major security standards.
+                </p>
+            </div>
+        </div>
+
+        <div class="email-section">
+            <p class="email-label">Be the first to know</p>
+            <form class="email-form" id="notifyForm" onsubmit="handleEmailSubmit(event)">
+                <input
+                    type="email"
+                    class="email-input"
+                    id="emailInput"
+                    placeholder="Enter your email"
+                    required
+                />
+                <button type="submit" class="email-button" id="notifyButton">
+                    Notify Me
+                </button>
+            </form>
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage">
+                Thanks! We'll notify you when Analytics is ready.
+            </div>
+            <p class="social-proof">
+                <strong>500+</strong> teams already waiting for this feature
+            </p>
+        </div>
+
+        <div class="features-footer">
+            <p>Analytics will be available to all Spendly users in Q3 2026</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleEmailSubmit(event) {
+        event.preventDefault();
+
+        const emailInput = document.getElementById('emailInput');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const notifyButton = document.getElementById('notifyButton');
+
+        errorMessage.classList.remove('show');
+        successMessage.classList.remove('show');
+        emailInput.classList.remove('error');
+
+        const email = emailInput.value.trim();
+
+        if (!validateEmail(email)) {
+            errorMessage.textContent = 'Please enter a valid email address.';
+            errorMessage.classList.add('show');
+            emailInput.classList.add('error');
+            return;
+        }
+
+        notifyButton.disabled = true;
+        notifyButton.textContent = 'Sending...';
+
+        setTimeout(() => {
+            successMessage.classList.add('show');
+            emailInput.value = '';
+            notifyButton.disabled = false;
+            notifyButton.textContent = 'Notify Me';
+        }, 500);
+    }
+
+    function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    document.getElementById('emailInput').addEventListener('input', () => {
+        const errorMessage = document.getElementById('errorMessage');
+        const emailInput = document.getElementById('emailInput');
+
+        errorMessage.classList.remove('show');
+        emailInput.classList.remove('error');
+    });
+
+    document.getElementById('emailInput').addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            document.getElementById('notifyForm').dispatchEvent(new Event('submit'));
+        }
+    });
+</script>
+{% endblock %}

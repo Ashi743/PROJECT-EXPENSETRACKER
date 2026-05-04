@@ -112,6 +112,33 @@ def logout():
     return redirect(url_for("landing", logged_out=True))
 
 
+@app.route("/dashboard")
+def dashboard():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("login"))
+
+    return render_template("dashboard.html", current_page="dashboard")
+
+
+@app.route("/analytics")
+def analytics():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("login"))
+
+    return render_template("analytics.html", current_page="analytics")
+
+
+@app.route("/settings")
+def settings():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("login"))
+
+    return render_template("settings.html", current_page="settings")
+
+
 @app.route("/profile")
 def profile():
     user_id = session.get("user_id")
@@ -261,6 +288,7 @@ def profile():
         date_error=filter_error,
         start_date=raw_start,
         end_date=raw_end,
+        current_page="profile",
     )
 
 

@@ -500,3 +500,4 @@ git restore --staged <file>   # Unstage file
 **Include `.claude` documentation updates explicitly.** They're part of your project. Commit them with `docs(.claude)` scope alongside your code changes.
 
 This creates a clean, understandable, and traceable history that serves your project for years.
+
