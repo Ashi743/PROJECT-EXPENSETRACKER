@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime, date
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from database.db import get_db, init_db, seed_db
@@ -105,10 +106,6 @@ def login():
         conn.close()
 
 
-# ------------------------------------------------------------------ #
-# Placeholder routes — students will implement these                  #
-# ------------------------------------------------------------------ #
-
 @app.route("/logout")
 def logout():
     session.clear()
@@ -121,6 +118,61 @@ def profile():
     if not user_id:
         return redirect(url_for("login"))
 
+    # --- Read and validate date filter query params ---
+    raw_start = request.args.get("start_date", "").strip()
+    raw_end = request.args.get("end_date", "").strip()
+
+    filter_error = None
+    start_date = None
+    end_date = None
+
+    if raw_start:
+        try:
+            start_date = datetime.strptime(raw_start, "%Y-%m-%d").date()
+        except ValueError:
+            filter_error = "Invalid start date. Please use YYYY-MM-DD format."
+
+    if raw_end and not filter_error:
+        try:
+            end_date = datetime.strptime(raw_end, "%Y-%m-%d").date()
+        except ValueError:
+            filter_error = "Invalid end date. Please use YYYY-MM-DD format."
+
+    if start_date and end_date and end_date < start_date and not filter_error:
+        filter_error = "End date cannot be before start date."
+
+    # If validation failed, clear the filter so we fall back to showing all expenses
+    if filter_error:
+        start_date = None
+        end_date = None
+
+    # --- Resolve the effective date bounds for SQL ---
+    # Spec rules:
+    #   start only  → start_date to today
+    #   end only    → earliest possible date to end_date
+    #   both        → between them inclusive
+    #   neither     → no date filter (show all)
+    today_str = date.today().isoformat()
+
+    if start_date and end_date:
+        sql_start = start_date.isoformat()
+        sql_end = end_date.isoformat()
+        filter_active = True
+    elif start_date:
+        sql_start = start_date.isoformat()
+        sql_end = today_str
+        filter_active = True
+        # Normalise end_date for display purposes
+        end_date = date.today()
+    elif end_date:
+        sql_start = "0000-01-01"
+        sql_end = end_date.isoformat()
+        filter_active = True
+    else:
+        sql_start = None
+        sql_end = None
+        filter_active = False
+
     conn = get_db()
     try:
         user = conn.execute(
@@ -132,32 +184,69 @@ def profile():
             session.clear()
             return redirect(url_for("login"))
 
-        totals = conn.execute(
-            "SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as total FROM expenses WHERE user_id = ?",
-            (user_id,)
-        ).fetchone()
+        if filter_active:
+            totals = conn.execute(
+                """SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as total
+                   FROM expenses
+                   WHERE user_id = ? AND date BETWEEN ? AND ?""",
+                (user_id, sql_start, sql_end),
+            ).fetchone()
 
-        recent = conn.execute(
-            """SELECT id, category, amount, date, description
-               FROM expenses WHERE user_id = ?
-               ORDER BY date DESC LIMIT 6""",
-            (user_id,)
-        ).fetchall()
+            recent = conn.execute(
+                """SELECT id, category, amount, date, description
+                   FROM expenses
+                   WHERE user_id = ? AND date BETWEEN ? AND ?
+                   ORDER BY date DESC
+                   LIMIT 6""",
+                (user_id, sql_start, sql_end),
+            ).fetchall()
 
-        by_category = conn.execute(
-            """SELECT category, COUNT(*) as count, SUM(amount) as total
-               FROM expenses WHERE user_id = ?
-               GROUP BY category ORDER BY total DESC""",
-            (user_id,)
-        ).fetchall()
+            by_category = conn.execute(
+                """SELECT category, COUNT(*) as count, SUM(amount) as total
+                   FROM expenses
+                   WHERE user_id = ? AND date BETWEEN ? AND ?
+                   GROUP BY category
+                   ORDER BY total DESC""",
+                (user_id, sql_start, sql_end),
+            ).fetchall()
+        else:
+            totals = conn.execute(
+                "SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as total FROM expenses WHERE user_id = ?",
+                (user_id,)
+            ).fetchone()
+
+            recent = conn.execute(
+                """SELECT id, category, amount, date, description
+                   FROM expenses WHERE user_id = ?
+                   ORDER BY date DESC LIMIT 6""",
+                (user_id,)
+            ).fetchall()
+
+            by_category = conn.execute(
+                """SELECT category, COUNT(*) as count, SUM(amount) as total
+                   FROM expenses WHERE user_id = ?
+                   GROUP BY category ORDER BY total DESC""",
+                (user_id,)
+            ).fetchall()
     finally:
         conn.close()
 
-    from datetime import datetime
     try:
         joined = datetime.strptime(user["created_at"], "%Y-%m-%d %H:%M:%S").strftime("%B %d, %Y")
     except (ValueError, TypeError):
         joined = user["created_at"]
+
+    # --- Build human-readable filter label for the template ---
+    filter_label = None
+    if filter_active:
+        def fmt(d):
+            return d.strftime("%B %d, %Y").replace(" 0", " ")
+        if start_date and end_date:
+            filter_label = f"{fmt(start_date)} – {fmt(end_date)}"
+        elif start_date:
+            filter_label = f"From {fmt(start_date)}"
+        elif end_date:
+            filter_label = f"Up to {fmt(end_date)}"
 
     return render_template(
         "profile.html",
@@ -166,8 +255,17 @@ def profile():
         recent=recent,
         by_category=by_category,
         joined=joined,
+        filter_active=filter_active,
+        filter_label=filter_label,
+        filter_error=filter_error,
+        start_date=raw_start,
+        end_date=raw_end,
     )
 
+
+# ------------------------------------------------------------------ #
+# Placeholder routes — students will implement these                  #
+# ------------------------------------------------------------------ #
 
 @app.route("/expenses/add")
 def add_expense():
