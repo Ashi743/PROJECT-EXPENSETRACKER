@@ -220,8 +220,8 @@ class TestNoFilter:
 
     def test_profile_no_active_filter_message_when_no_filter(self, client):
         """No 'Showing expenses' / active filter message is rendered without a filter."""
-        _register_and_login(client)
-        _insert_expense(_register_and_login.__wrapped__ if hasattr(_register_and_login, "__wrapped__") else None, 100.00, "Food", "2026-04-01") if False else None
+        user_id = _register_and_login(client)
+        _insert_expense(user_id, 100.00, "Food", "2026-04-01")
         response = _profile(client)
         html = response.data.decode()
         assert "Showing expenses" not in html
