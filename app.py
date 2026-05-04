@@ -296,9 +296,70 @@ def profile():
 # Placeholder routes — students will implement these                  #
 # ------------------------------------------------------------------ #
 
-@app.route("/expenses/add")
+@app.route("/expenses/add", methods=["GET", "POST"])
 def add_expense():
-    return "Add expense — coming in Step 7"
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("login"))
+
+    VALID_CATEGORIES = ["Food", "Transport", "Bills", "Health", "Entertainment", "Shopping", "Other"]
+
+    if request.method == "GET":
+        today = date.today().isoformat()
+        return render_template("add_expense.html", current_page="add_expense", today=today)
+
+    # --- Validate POST fields ---
+    amount_raw = request.form.get("amount", "").strip()
+    category   = request.form.get("category", "").strip()
+    date_raw   = request.form.get("date", "").strip()
+    description = request.form.get("description", "").strip()
+
+    def fail(msg):
+        today = date.today().isoformat()
+        return render_template("add_expense.html",
+                               current_page="add_expense",
+                               error=msg,
+                               amount=amount_raw,
+                               category=category,
+                               date=date_raw,
+                               description=description,
+                               today=today)
+
+    if not amount_raw:
+        return fail("Amount is required.")
+    try:
+        amount = float(amount_raw)
+    except ValueError:
+        return fail("Please enter a valid amount.")
+    if amount <= 0:
+        return fail("Amount must be greater than 0.")
+
+    if not category or category not in VALID_CATEGORIES:
+        return fail("Please select a valid category.")
+
+    if not date_raw:
+        return fail("Date is required.")
+    try:
+        expense_date = datetime.strptime(date_raw, "%Y-%m-%d").date()
+    except ValueError:
+        return fail("Please enter a valid date.")
+    if expense_date > date.today():
+        return fail("Date cannot be in the future.")
+
+    if len(description) > 500:
+        return fail("Description must be 500 characters or fewer.")
+
+    conn = get_db()
+    try:
+        conn.execute(
+            "INSERT INTO expenses (user_id, amount, category, date, description) VALUES (?, ?, ?, ?, ?)",
+            (user_id, amount, category, date_raw, description or None),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    return redirect(url_for("profile"))
 
 
 @app.route("/expenses/<int:id>/edit")
