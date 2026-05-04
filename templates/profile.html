@@ -38,7 +38,10 @@
 
             <!-- Recent transactions -->
             <div class="profile-column">
-                <h2 class="profile-section-title">Recent Transactions</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2 class="profile-section-title">Recent Transactions</h2>
+                    <a href="{{ url_for('add_expense') }}" class="btn-primary">+ Add Expense</a>
+                </div>
                 <!-- Date filter form -->
                 <form class="date-filter-form" method="GET" action="{{ url_for('profile') }}">
                     {% if date_error %}
