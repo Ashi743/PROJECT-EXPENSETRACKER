@@ -39,6 +39,32 @@
             <!-- Recent transactions -->
             <div class="profile-column">
                 <h2 class="profile-section-title">Recent Transactions</h2>
+                <!-- Date filter form -->
+                <form class="date-filter-form" method="GET" action="{{ url_for('profile') }}">
+                    {% if date_error %}
+                    <p class="date-filter-error">{{ date_error }}</p>
+                    {% endif %}
+                    {% if has_filter and filter_message %}
+                    <p class="date-filter-active">{{ filter_message }} —
+                        <a href="{{ url_for('profile') }}" class="date-filter-clear">Clear</a>
+                    </p>
+                    {% endif %}
+                    <div class="date-filter-row">
+                        <div class="date-filter-field">
+                            <label for="start_date">From</label>
+                            <input type="date" id="start_date" name="start_date"
+                                   class="form-input"
+                                   value="{{ start_date or '' }}">
+                        </div>
+                        <div class="date-filter-field">
+                            <label for="end_date">To</label>
+                            <input type="date" id="end_date" name="end_date"
+                                   class="form-input"
+                                   value="{{ end_date or '' }}">
+                        </div>
+                        <button type="submit" class="btn-filter">Filter</button>
+                    </div>
+                </form>
                 {% if recent %}
                 <div class="profile-transactions">
                     {% for txn in recent %}
