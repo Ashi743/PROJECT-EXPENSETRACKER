@@ -165,7 +165,7 @@ def profile():
         # Normalise end_date for display purposes
         end_date = date.today()
     elif end_date:
-        sql_start = "0000-01-01"
+        sql_start = "1900-01-01"  # earliest realistic date for open-ended end_date filters
         sql_end = end_date.isoformat()
         filter_active = True
     else:
@@ -240,6 +240,7 @@ def profile():
     filter_label = None
     if filter_active:
         def fmt(d):
+            # Removes leading zeros from day: "April 01" → "April 1"
             return d.strftime("%B %d, %Y").replace(" 0", " ")
         if start_date and end_date:
             filter_label = f"{fmt(start_date)} – {fmt(end_date)}"
@@ -255,9 +256,9 @@ def profile():
         recent=recent,
         by_category=by_category,
         joined=joined,
-        filter_active=filter_active,
-        filter_label=filter_label,
-        filter_error=filter_error,
+        has_filter=filter_active,
+        filter_message=filter_label,
+        date_error=filter_error,
         start_date=raw_start,
         end_date=raw_end,
     )
